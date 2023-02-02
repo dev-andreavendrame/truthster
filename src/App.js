@@ -1,6 +1,16 @@
+// Graphic imports
 import { useState, useEffect } from 'react';
-import MButton from '@mui/material/Button';
+import { Box, AppBar, Typography, Button } from '@mui/material';
 import './App.css';
+
+// Logic imports
+import { INSERT_INTERVIEW_DATA, GET_ALL_DATA } from './components/API/APIs';
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://158.110.146.227:9000',
+});
+
 
 function App() {
 
@@ -10,74 +20,67 @@ function App() {
   useEffect(() => {
   });
 
-
-  function updateConnectedWallet() {
-
-    if (currentAccount === "") {
-      console.log("Not logged in");
-      return (<MButton variant="contained" style={{
-        borderRadius: 10,
-        backgroundColor: "#a1c126",
-        padding: "10px 15px",
-        fontSize: "13px"
-      }} size="large" onClick={connectWallet}>Connect wallet</MButton>);
-    } else {
-      return (
-        <div class="d-inline-flex" style={{
-          padding: "10px 15px",
-          fontSize: "13px",
-          color: "#bad640"
-        }}>
-          <h5 class="px-2">{"Connected wallet: " + currentAccount.substring(0, 5) + "..." + currentAccount.substring(currentAccount.length, currentAccount.length - 5)}</h5>
-        </div>
-      );
-    }
-  }
-
-  const connectWallet = async () => {
-
-    // Check Metamask presence
-    var { ethereum } = window;
-    if (!ethereum) {
-      console.log("Metamask not installed");
-    } else {
-      console.log("Wallet found, ready to start");
-    }
-
-    try {
-      const accounts = await ethereum.request({ method: 'eth_requestAccounts' }); // fundamental to add this line for correctness
-      if (accounts.length !== 0) {
-        setCurrentAccount(accounts[0]);
-        console.log("Account 0: " + accounts[0]);
-      } else {
-        console.log("0 account connected to Metamask extension");
-      }
-    } catch {
-      console.log("Error during Metamask connection");
-    }
+  const insertTestEntry = () => {
+    api.post(INSERT_INTERVIEW_DATA, {
+      "user_id": "The interviewer identifier",
+      "date": "the project creation date",
+      "media": [{
+        "type": "media type",
+        "path": "position of the media file",
+        "sig_hash": "the user signature of the hash of the media file"
+      }],
+      "permision": "project's permissions",
+      "interviewee_id": "The interviewee identifier",
+      "gps": "interviewee position"
+    })
+      .then(function (response) {
+        console.log(response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
 
   }
 
+  const getAllData = () => {
+    api.get(GET_ALL_DATA)
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+
+  }
 
 
   return (
-    <div className="App">
-      <div class="p-3 mb-2 background_violet">
-        <nav class="navbar navbar-expand-lg navbar-light">
-          <div class="container-fluid">
-            <div class="px-5">
-              <h3 class="text-light">Poison Essence</h3>
-            </div>
-            <div class="px-5">
-              {updateConnectedWallet()}
-            </div>
-          </div>
-        </nav>
-      </div>
-      <div>
-      </div>
+    <AppBar position="static" sx={{ height: 130, backgroundColor: "#282c34", boxShadow: 24 }}>
 
-    </div>
+      <Box display="inline-flex" alignItems="center" justifyContent="space-between" sx={{ height: 100, mt: 3 }} >
+        <Box display='inline-flex' sx={{ ml: 4, alignItems: "center" }}>
+          <Box >
+            <Typography sx={{ ml: 2, fontWeight: 'bold', fontSize: 'clamp(26px, 4vw, 40px)', textAlign: 'left' }} variant='h4' >
+              Truthster
+            </Typography>
+            <Typography sx={{ ml: 2, mb: 3, fontWeight: 'normal', fontSize: 'clamp(18px, 4vw, 30px)', textAlign: 'left' }} variant='h5'>
+              Client UI
+            </Typography>
+          </Box>
+        </Box>
+        <Box sx={{ minWidth: 50 }} />
+        <Box display="inline-flex" gap={3} sx={{ mr: 5, mb: 2, alignItems: "center", justifyContent: "flex-end", minHeight: 10 }}>
+          <Button onClick={insertTestEntry} className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ width: 200, maxHeight: 100, borderRadius: 10 }}>
+            insert test entry
+          </Button>
+          <Button onClick={getAllData} className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ width: 200, maxHeight: 100, borderRadius: 10 }}>
+            Load
+            <br />
+            all data
+          </Button>
+        </Box>
+      </Box>
+    </AppBar>
   );
 }
 
