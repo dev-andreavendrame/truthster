@@ -4,7 +4,7 @@ import { Box, AppBar, Typography, Button } from '@mui/material';
 import './App.css';
 
 // Logic imports
-import { INSERT_INTERVIEW_DATA, GET_ALL_DATA } from './components/API/APIs';
+import { INSERT_INTERVIEW_DATA, GET_ALL_DATA, REMOVE_INTERVIEW_DATA } from './components/API/APIs';
 import axios from 'axios';
 
 const api = axios.create({
@@ -22,17 +22,17 @@ function App() {
 
   const insertTestEntry = () => {
     api.post(INSERT_INTERVIEW_DATA, {
-      "user_id": "The interviewer identifier",
-      "date": "the project creation date",
-      "media": [{
-        "type": "media type",
-        "path": "position of the media file",
-        "sig_hash": "the user signature of the hash of the media file"
+      user_id: "The identifier",
+      date: "the project creation date",
+      media: [{
+        type: "media type",
+        path: "position of the media file",
+        sig_hash: "the user signature of the hash of the media file"
       }],
-      "permision": "project's permissions",
-      "interviewee_id": "The interviewee identifier",
-      "gps": "interviewee position"
-    })
+      permision: "project's permissions",
+      interviewee_id: "The interviewee identifier",
+      gps: "interviewee position"
+    },)
       .then(function (response) {
         console.log(response.data);
       })
@@ -50,7 +50,25 @@ function App() {
       .catch(error => {
         console.error(error);
       });
+  }
 
+  const deleteInterviewData = () => {
+    const userId = "The identifier";
+    const mediaHash = "the user signature of the hash of the media file";
+    api.get(REMOVE_INTERVIEW_DATA, {
+      user_id: userId,
+      media: [{
+        type: "media type",
+        path: "position of the media file",
+        sig_hash: "the user signature of the hash of the media file"
+      }],
+    })
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.error(error);
+      });
   }
 
 
@@ -77,6 +95,11 @@ function App() {
             Load
             <br />
             all data
+          </Button>
+          <Button onClick={deleteInterviewData} className='blueGradientButton blueGradientButton--navigation' variant='contained' size='large' sx={{ width: 200, maxHeight: 100, borderRadius: 10 }}>
+            Remove
+            <br />
+            interview
           </Button>
         </Box>
       </Box>
